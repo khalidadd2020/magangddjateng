@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Absensi Anak Magang</title>
+<style>
+  :root{
+    --ink:#1B2420;
+    --paper:#F7F5EF;
+    --paper-2:#EFEBE0;
+    --pine:#1F5C45;
+    --pine-dark:#153F30;
+    --clay:#B5652B;
+    --line:#D9D3C3;
+    --white:#FFFFFF;
+    --danger:#A6392F;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Georgia,"Times New Roman",serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  .app{
+    width:100%;
+    max-width:460px;
+    min-height:100vh;
+    background:var(--paper);
+    display:flex;
+    flex-direction:column;
+  }
+  header{
+    padding:28px 22px 18px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:12.5px;
+    letter-spacing:.02em;
+    color:var(--pine);
+    font-weight:600;
+    margin:0 0 6px;
+  }
+  h1{
+    font-size:26px;
+    line-height:1.15;
+    margin:0 0 4px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .sub{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:13.5px;
+    color:#5B655D;
+    margin:0;
+  }
+
+  .tabs{
+    display:flex;
+    margin:18px 22px 0;
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px;
+    background:var(--white);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:10px 0;
+    border-radius:999px;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+    color:#6C766E;
+    transition:background .18s ease, color .18s ease;
+    user-select:none;
+  }
+  .tab.active{
+    background:var(--pine);
+    color:var(--white);
+  }
+
+  main{
+    flex:1;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+  }
+
+  .field label{
+    display:block;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:12.5px;
+    font-weight:600;
+    color:#4B564E;
+    margin-bottom:7px;
+  }
+  .field input[type=text], .field textarea{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 13px;
+    font-size:15.5px;
+    font-family:inherit;
+    background:var(--white);
+    color:var(--ink);
+  }
+  .field textarea{resize:vertical;min-height:100px;line-height:1.5;}
+  .field input:focus, .field textarea:focus{
+    outline:2px solid var(--pine);
+    outline-offset:1px;
+  }
+
+  .cam-box{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    background:var(--pine-dark);
+    border-radius:var(--radius);
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  video, .shot{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .shot{display:none;}
+  .cam-box.has-shot video{display:none;}
+  .cam-box.has-shot .shot{display:block;}
+  .cam-hint{
+    position:absolute;
+    bottom:0; left:0; right:0;
+    padding:10px 12px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:12px;
+    color:#E9E6DC;
+    background:linear-gradient(transparent, rgba(0,0,0,.55));
+  }
+
+  .cam-actions{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+  }
+  button{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-weight:600;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14.5px;
+    padding:12px 16px;
+  }
+  .btn-outline{
+    flex:1;
+    background:var(--white);
+    border:1px solid var(--line);
+    color:var(--ink);
+  }
+  .btn-primary{
+    flex:1;
+    background:var(--pine);
+    color:var(--white);
+  }
+  .btn-outline:active, .btn-primary:active{transform:scale(.98);}
+
+  .loc-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    border:1px solid var(--line);
+    background:var(--white);
+    border-radius:10px;
+    padding:12px 13px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:13.5px;
+  }
+  .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:#C7C1AE;
+    flex:none;
+  }
+  .dot.ok{background:var(--pine);}
+  .dot.err{background:var(--danger);}
+  .loc-text{flex:1;color:#4B564E;}
+  .loc-refresh{
+    background:none;border:none;color:var(--pine);
+    font-weight:600;font-size:13px;padding:2px 4px;
+  }
+
+  .submit-wrap{margin-top:4px;}
+  .btn-submit{
+    width:100%;
+    background:var(--clay);
+    color:var(--white);
+    padding:15px;
+    font-size:15.5px;
+    border-radius:10px;
+  }
+  .btn-submit:disabled{
+    background:#D8CFBE;
+    color:#8B8577;
+    cursor:not-allowed;
+  }
+
+  .banner{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:13.5px;
+    line-height:1.5;
+    padding:12px 14px;
+    border-radius:10px;
+    display:none;
+  }
+  .banner.show{display:block;}
+  .banner.info{background:#EFEBE0;color:#4B564E;}
+  .banner.ok{background:#E4EEE8;color:var(--pine-dark);}
+  .banner.err{background:#F5E6E3;color:var(--danger);}
+
+  footer{
+    padding:16px 22px 26px;
+    text-align:center;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    font-size:11.5px;
+    color:#9A9487;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <p class="eyebrow">Absensi Digital</p>
+    <h1>Absen Anak Magang</h1>
+    <p class="sub">Rekam jam, lokasi, dan foto — otomatis tersimpan ke Google Sheet.</p>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" id="tabMasuk">Absen Masuk</div>
+    <div class="tab" id="tabPulang">Absen Pulang</div>
+  </div>
+
+  <main>
+    <div id="bannerConfig" class="banner err"></div>
+
+    <div class="field">
+      <label for="nama">Nama lengkap</label>
+      <input type="text" id="nama" placeholder="Tulis nama sesuai data magang" autocomplete="name">
+    </div>
+
+    <div class="field">
+      <label>Foto selfie</label>
+      <div class="cam-box" id="camBox">
+        <video id="video" autoplay playsinline muted></video>
+        <img class="shot" id="shotImg" alt="Foto selfie">
+        <div class="cam-hint" id="camHint">Arahkan kamera ke wajah, lalu tekan ambil foto</div>
+      </div>
+      <div class="cam-actions">
+        <button class="btn-outline" id="btnRetake" style="display:none">Ambil ulang</button>
+        <button class="btn-primary" id="btnShoot">Ambil foto</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Lokasi</label>
+      <div class="loc-row">
+        <div class="dot" id="locDot"></div>
+        <div class="loc-text" id="locText">Meminta izin lokasi…</div>
+        <button class="loc-refresh" id="btnLoc">Ulangi</button>
+      </div>
+    </div>
+
+    <div class="field" id="tugasField" style="display:none">
+      <label for="tugas">Tugas yang dikerjakan hari ini</label>
+      <textarea id="tugas" placeholder="Tulis ringkasan tugas atau kegiatan hari ini, boleh dalam poin-poin"></textarea>
+    </div>
+
+    <div id="bannerStatus" class="banner"></div>
+
+    <div class="submit-wrap">
+      <button class="btn-submit" id="btnSubmit" disabled>Kirim absen masuk</button>
+    </div>
+  </main>
+
+  <footer>Dibuat untuk pencatatan absensi anak magang</footer>
+</div>
+
+<canvas id="canvas" style="display:none"></canvas>
+
+<script>
+  // ==========================================================
+  // GANTI URL DI BAWAH INI dengan URL deployment Apps Script kamu
+  // Lihat PANDUAN-SETUP.md untuk cara mendapatkannya.
+  // ==========================================================
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxgYu0EdjNleqQSOBIzPMjF7LkqXec2dAkj3d9roRzikfInix8yfku1wa85HIV7bVQ/exec";
+
+  let mode = "checkin";
+  let stream = null;
+  let fotoBase64 = null;
+  let lokasi = null;
+
+  const el = (id) => document.getElementById(id);
+  const tabMasuk = el('tabMasuk'), tabPulang = el('tabPulang');
+  const tugasField = el('tugasField');
+  const btnSubmit = el('btnSubmit');
+  const bannerConfig = el('bannerConfig');
+  const bannerStatus = el('bannerStatus');
+  const camBox = el('camBox');
+  const video = el('video');
+  const shotImg = el('shotImg');
+  const camHint = el('camHint');
+  const btnShoot = el('btnShoot');
+  const btnRetake = el('btnRetake');
+  const locDot = el('locDot');
+  const btnLoc = el('btnLoc');
+  const namaInput = el('nama');
+  const tugasInput = el('tugas');
+  const canvas = el('canvas');
+
+  function checkConfig(){
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('PASTE_URL') !== -1) {
+      bannerConfig.textContent = "Aplikasi belum terhubung ke Google Sheet. Buka file HTML ini, isi APPS_SCRIPT_URL sesuai PANDUAN-SETUP.md.";
+      bannerConfig.classList.add('show');
+      return false;
+    }
+    return true;
+  }
+  const configured = checkConfig();
+
+  function setMode(next){
+    mode = next;
+    tabMasuk.classList.toggle('active', mode === 'checkin');
+    tabPulang.classList.toggle('active', mode === 'checkout');
+    tugasField.style.display = mode === 'checkout' ? 'block' : 'none';
+    btnSubmit.textContent = mode === 'checkin' ? 'Kirim absen masuk' : 'Kirim absen pulang';
+    updateSubmitState();
+  }
+  tabMasuk.addEventListener('click', () => setMode('checkin'));
+  tabPulang.addEventListener('click', () => setMode('checkout'));
+
+  // ---------- Kamera ----------
+  async function startCamera(){
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      video.srcObject = stream;
+    } catch (err) {
+      camHint.textContent = "Tidak bisa mengakses kamera. Izinkan akses kamera di browser lalu muat ulang halaman.";
+    }
+  }
+  startCamera();
+
+  btnShoot.addEventListener('click', () => {
+    const size = Math.min(video.videoWidth, video.videoHeight);
+    canvas.width = 640; canvas.height = 640;
+    const ctx = canvas.getContext('2d');
+    const sx = (video.videoWidth - size) / 2;
+    const sy = (video.videoHeight - size) / 2;
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, sx, sy, size, size, 0, 0, canvas.width, canvas.height);
+    fotoBase64 = canvas.toDataURL('image/jpeg', 0.75);
+
+    shotImg.src = fotoBase64;
+    camBox.classList.add('has-shot');
+    btnShoot.style.display = 'none';
+    btnRetake.style.display = 'block';
+    camHint.textContent = "Foto tersimpan";
+    updateSubmitState();
+  });
+
+  btnRetake.addEventListener('click', () => {
+    fotoBase64 = null;
+    camBox.classList.remove('has-shot');
+    btnShoot.style.display = 'block';
+    btnRetake.style.display = 'none';
+    camHint.textContent = "Arahkan kamera ke wajah, lalu tekan ambil foto";
+    updateSubmitState();
+  });
+
+  // ---------- Lokasi ----------
+  function getLocation(){
+    locDot.className = 'dot';
+    el('locText').textContent = "Meminta izin lokasi…";
+    if (!navigator.geolocation) {
+      locDot.className = 'dot err';
+      el('locText').textContent = "Perangkat tidak mendukung lokasi.";
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      lokasi = { lat: pos.coords.latitude.toFixed(6), lng: pos.coords.longitude.toFixed(6), alamat: null };
+      locDot.className = 'dot ok';
+      el('locText').textContent = "Lokasi didapat (" + lokasi.lat + ", " + lokasi.lng + ")";
+      updateSubmitState();
+      // Best-effort reverse geocode, boleh gagal tanpa mengganggu alur
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lokasi.lat}&lon=${lokasi.lng}`);
+        const j = await res.json();
+        if (j && j.display_name) {
+          lokasi.alamat = j.display_name;
+          el('locText').textContent = j.display_name;
+        }
+      } catch (e) { /* abaikan, koordinat tetap dipakai */ }
+    }, (err) => {
+      locDot.className = 'dot err';
+      el('locText').textContent = "Gagal ambil lokasi. Izinkan akses lokasi lalu tekan Ulangi.";
+    }, { enableHighAccuracy: true, timeout: 12000 });
+  }
+  btnLoc.addEventListener('click', getLocation);
+  getLocation();
+
+  // ---------- Validasi & submit ----------
+  namaInput.addEventListener('input', updateSubmitState);
+  tugasInput.addEventListener('input', updateSubmitState);
+
+  function updateSubmitState(){
+    let ready = configured && namaInput.value.trim().length > 1 && !!fotoBase64 && !!lokasi;
+    if (mode === 'checkout') ready = ready && tugasInput.value.trim().length > 3;
+    btnSubmit.disabled = !ready;
+  }
+
+  btnSubmit.addEventListener('click', async () => {
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Mengirim…";
+    bannerStatus.className = 'banner info show';
+    bannerStatus.textContent = "Mengirim data, mohon tunggu…";
+
+    const payload = {
+      action: mode,
+      nama: namaInput.value.trim(),
+      foto: fotoBase64,
+      lat: lokasi.lat,
+      lng: lokasi.lng,
+      alamat: lokasi.alamat,
+      tugas: mode === 'checkout' ? tugasInput.value.trim() : undefined
+    };
+
+    try {
+      const res = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        bannerStatus.className = 'banner ok show';
+        bannerStatus.textContent = data.message;
+        resetForm();
+      } else {
+        bannerStatus.className = 'banner err show';
+        bannerStatus.textContent = data.message || "Gagal mengirim absen.";
+      }
+    } catch (err) {
+      bannerStatus.className = 'banner err show';
+      bannerStatus.textContent = "Tidak bisa terhubung ke server. Periksa koneksi internet lalu coba lagi.";
+    }
+
+    btnSubmit.textContent = mode === 'checkin' ? 'Kirim absen masuk' : 'Kirim absen pulang';
+    updateSubmitState();
+  });
+
+  function resetForm(){
+    fotoBase64 = null;
+    camBox.classList.remove('has-shot');
+    btnShoot.style.display = 'block';
+    btnRetake.style.display = 'none';
+    camHint.textContent = "Arahkan kamera ke wajah, lalu tekan ambil foto";
+    tugasInput.value = '';
+    updateSubmitState();
+  }
+
+  setMode('checkin');
+</script>
+</body>
+</html>
